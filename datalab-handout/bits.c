@@ -143,7 +143,8 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return 2;
+    int temp=~(x&y)&~(~x&~y);//异或是求01,取11，01和00,01的交集
+    return temp;
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -152,11 +153,10 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
+    int min=(1<<31);
+    return min;//最小补码
 
 }
-//2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
  *     and 0 otherwise 
@@ -165,7 +165,10 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+    int a,b;//最大补码为0x7fffffff
+    a=x+x+2;//当a取0时，x=0x7fffffff或0xffffffff
+    b=!(a|!~x);//排除0xffffffff
+    return b;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
