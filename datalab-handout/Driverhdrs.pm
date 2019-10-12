@@ -5,7 +5,7 @@
 package Driverhdrs;
 
 $LAB = "datalab";
-$SERVER_NAME = "changeme.ics.cs.cmu.edu";
+$SERVER_NAME = "39.106.9.23";
 $SERVER_PORT = 8081;
 $COURSE_NAME = "csapp";
 $AUTOGRADE_TIMEOUT = 0;
