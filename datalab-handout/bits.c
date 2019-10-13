@@ -265,24 +265,24 @@ int logicalNeg(int x) {
  *  Legal ops: ! ~ & ^ | + << >>
  *  Max ops: 90
  *  Rating: 4
- */
+ *///题目是求能够表示x的最少位数，不能用if语句，可以用二分法
 int howManyBits(int x) {
-    int shiftSign = x >> 31;
-    int operations = shiftSign ^ x;      
-    int negateOps = !operations;
-    int oppSign =  (!(!operations) << 31) >> 31;
-    int shift16 = !(!(operations >> 16)) << 4;
-        operations = operations >> shift16;
-    int shift8 = !(!(operations >> 8)) << 3;
-        operations = operations >> shift8;
-    int shift4 = !(!(operations >> 4)) << 2;
-        operations = operations >> shift4;
-    int shift2 = !(!(operations >> 2)) << 1;
-        operations = operations >> shift2;
-    int shift1 = !(!(operations >> 1));
-        operations = shift16 + shift8 + shift4 + shift2 + shift1;
-        operations += 2;   
-    return (negateOps | (operations&oppSign));
+    int shiftSign = x >> 31;//符号位
+    int a = shiftSign ^ x;      
+    int b = !a;
+    int oppSign =  (!(!a) << 31) >> 31;
+    int shift16 = !(!(a >> 16)) << 4;
+        a = a >> shift16;
+    int shift8 = !(!(a >> 8)) << 3;
+        a = a >> shift8;
+    int shift4 = !(!(a >> 4)) << 2;
+        a = a >> shift4;
+    int shift2 = !(!(a >> 2)) << 1;
+        a = a >> shift2;
+    int shift1 = !(!(a >> 1));
+        a = shift16 + shift8 + shift4 + shift2 + shift1;
+        a += 2;   
+    return (b | (a&oppSign));
 }
 //float
 /* 
@@ -296,14 +296,18 @@ int howManyBits(int x) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned floatScale2(unsigned uf) {
-         int exp_ = (uf&0x7f800000)>>23;
-         int s_ = uf&0x80000000;
-         if(exp_ == 0) return (uf<<1)|s_;
-         if(exp_ == 255) return uf;
-         ++exp_;
-         if(exp_ == 255) return 0x7f800000|s_;
-         return (uf&0x807fffff)|(exp_<<23);
+unsigned floatScale2(unsigned uf) {//这道题只要知道浮点数的构造很容易求
+         int exp = (uf&0x7f800000)>>23;
+         int s = uf&0x80000000;
+         if(exp == 0)
+            return (uf<<1)|s;
+         if(exp == 255)
+            return uf;
+            ++exp;
+         if(exp == 255)
+            return 0x7f800000|s;
+        
+         return (uf&0x807fffff)|(exp<<23);
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -318,19 +322,25 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-   /*将浮点数化为有符号整数*/
+   /*将浮点数化为有符号整数,这个参考csdn上的一个答案*/
     int s    = uf>>31;//符号位
-    int exp  = ((uf&0x7f800000)>>23)-127;//小数位
-    int frac = (uf&0x007fffff)|0x00800000; 
-    if(!(uf&0x7fffffff)) return 0;
-    if(exp > 31) return 0x80000000;
-    if(exp < 0) return 0;
-    if(exp > 23) frac <<= (exp-23);
+    int exp  = ((uf&0x7f800000)>>23)-127;//阶码
+    int frac = (uf&0x007fffff)|0x00800000; //小数
+    if(!(uf&0x7fffffff)) 
+       return 0;
+    if(exp > 31)
+       return 0x80000000;
+    if(exp < 0)
+       return 0;
+    if(exp > 23)
+       frac <<= (exp-23);
     else frac >>= (23-exp);
-
-    if(!((frac>>31)^s)) return frac;
-    else if(frac>>31) return 0x80000000;
-    else return ~frac+1;    
+    if(!((frac>>31)^s)) 
+       return frac;
+    else if(frac>>31)
+       return 0x80000000;
+    else
+       return ~frac+1;//考虑几种情况    
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -345,10 +355,15 @@ int floatFloat2Int(unsigned uf) {
  *   Max ops: 30 
  *   Rating: 4
  */
-unsigned floatPower2(int x) {  
-         if(x<-127) return 0;
-         if(x>128) return 0x7f800000;
-         x += 127;
-         x = x << 23;
-         return x;
+unsigned floatPower2(int x) {//这题关键在2.0是浮点数  
+         int a=1&((x-129)>>31)
+         int b=1&((x=1260>>31);
+         int c=!(1&((x+149)>>31));
+         if(!a)
+           return ((1<<8)-1)<<23;
+         if(a&&(!b))
+           return (x+127)<<23;
+         if(b&&c)
+           return 1<<(x+149);
+         return 0;
 }
