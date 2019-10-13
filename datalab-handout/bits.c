@@ -267,10 +267,10 @@ int logicalNeg(int x) {
  *  Rating: 4
  *///题目是求能够表示x的最少位数，不能用if语句，可以用二分法
 int howManyBits(int x) {
-    int shiftSign = x >> 31;//符号位
-    int a = shiftSign ^ x;      
+    int Sign = x >> 31;//符号位
+    int a = Sign ^ x;      
     int b = !a;
-    int oppSign =  (!(!a) << 31) >> 31;
+    int c =  (!(!a) << 31) >> 31;
     int shift16 = !(!(a >> 16)) << 4;
         a = a >> shift16;
     int shift8 = !(!(a >> 8)) << 3;
@@ -280,9 +280,8 @@ int howManyBits(int x) {
     int shift2 = !(!(a >> 2)) << 1;
         a = a >> shift2;
     int shift1 = !(!(a >> 1));
-        a = shift16 + shift8 + shift4 + shift2 + shift1;
-        a += 2;   
-    return (b | (a&oppSign));
+        a = shift16 + shift8 + shift4 + shift2 + shift1+2;   
+    return (b|(a&c));
 }
 //float
 /* 
@@ -355,15 +354,6 @@ int floatFloat2Int(unsigned uf) {
  *   Max ops: 30 
  *   Rating: 4
  */
-unsigned floatPower2(int x) {//这题关键在2.0是浮点数  
-         int a=1&((x-129)>>31)
-         int b=1&((x=1260>>31);
-         int c=!(1&((x+149)>>31));
-         if(!a)
-           return ((1<<8)-1)<<23;
-         if(a&&(!b))
-           return (x+127)<<23;
-         if(b&&c)
-           return 1<<(x+149);
+unsigned floatPower2(int x) {//这题关键在2.0是浮点数,找到临界值，分过大过小和规格化等几种情况
          return 0;
 }
