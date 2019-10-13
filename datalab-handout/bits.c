@@ -208,10 +208,14 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-    int a=!((x+6)>>6);//上限
+   /* int a=!((x+6)>>6);//上限
     int b=((x-16)>>5);//下限
     int c=a&b;
-    return c;
+    return c;感觉这种做法是对的，但不通过*/
+  /*用做差判断符号的方法，结合上题*/
+   int a=!((x+~48+1)>>31);
+   int b=!!((x+~58+1)>>31);
+   return a&b;//在dev里是对的，在这里不对，真搞不懂
 }
 /* 
  * conditional - same as x ? y : z 
@@ -232,10 +236,10 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-    int x1=x>>31;
-    int y1=y>>31;
-    int r=((x+(~y))>>31)&(!(x1^y1));
-    int s=x1&(!y1);
+    int a=x>>31;
+    int b=y>>31;//符号位
+    int r=((x+(~y))>>31)&(!(a^b));//同号，x+~y=x-y-1
+    int s=a&(!b);//x(+),y(-)
     return r|s;
 }
 //4
@@ -248,7 +252,7 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-    return ~(((~x+1)|x)>> 31)&1;
+    return ~(((~x+1)|x)>> 31)&1;//保证只有x=0时返回1,只有0的相反数为0
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *               two's complement
@@ -314,18 +318,19 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-    int s_    = uf>>31;
-    int exp_  = ((uf&0x7f800000)>>23)-127;
-    int frac_ = (uf&0x007fffff)|0x00800000; 
+   /*将浮点数化为有符号整数*/
+    int s    = uf>>31;//符号位
+    int exp  = ((uf&0x7f800000)>>23)-127;//小数位
+    int frac = (uf&0x007fffff)|0x00800000; 
     if(!(uf&0x7fffffff)) return 0;
-    if(exp_ > 31) return 0x80000000;
-    if(exp_ < 0) return 0;
-    if(exp_ > 23) frac_ <<= (exp_-23);
-    else frac_ >>= (23-exp_);
+    if(exp > 31) return 0x80000000;
+    if(exp < 0) return 0;
+    if(exp > 23) frac <<= (exp_-23);
+    else frac >>= (23-exp);
 
-    if(!((frac_>>31)^s_)) return frac_;
-    else if(frac_>>31) return 0x80000000;
-    else return ~frac_+1;    
+    if(!((frac>>31)^s)) return frac;
+    else if(frac>>31) return 0x80000000;
+    else return ~frac+1;    
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -340,7 +345,10 @@ int floatFloat2Int(unsigned uf) {
  *   Max ops: 30 
  *   Rating: 4
  */
-unsigned floatPower2(int x) {
-   
-  return 2;
+unsigned floatPower2(int x) {  
+         if(x<-127) return 0;
+         if(x>128) return 0x7f800000;
+         x += 127;
+         x = x << 23;
+         return x;
 }
