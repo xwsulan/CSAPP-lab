@@ -143,8 +143,8 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-    int temp=~(x&y)&~(~x&~y);//异或是求01,取11，01和00,01的交集
-    return temp;
+    return ~(x&y)&~(~x&~y);//异或是求01,取11，01和00,01的交集
+    
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -153,8 +153,7 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-    int min=(1<<31);
-    return min;//最小补码
+    return  1<<31; //最小补码
 
 }
 /*
@@ -165,10 +164,10 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-    int a,b;//最大补码为0x7fffffff
-    a=x+x+2;//当a取0时，x=0x7fffffff或0xffffffff
-    b=!(a|!~x);//排除0xffffffff
-    return b;
+   /* int a;//最大补码为0x7fffffff
+    a=x+x+2;//当a取0时，x=0x7fffffff或0xffffffff*/
+    return !((x+x+2)|!~x);//排除0xffffffff
+    
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -184,8 +183,8 @@ int allOddBits(int x) {
     int b=(a<<8)+a;
     int c=(b<<8)+a;
     int d=(c<<8)+a;
-    int e=!(~x&d);
-    return e;
+    return !(~x&d);
+    
 }
 /* 
  * negate - return -x 
@@ -212,10 +211,11 @@ int isAsciiDigit(int x) {
     int b=((x-16)>>5);//下限
     int c=a&b;
     return c;感觉这种做法是对的，但不通过*/
-  /*用做差判断符号的方法，结合上题*/
+  /*用做差判断符号的方法，结合上题
    int a=!((x+~48+1)>>31);
    int b=!!((x+~58+1)>>31);
-   return a&b;//在dev里是对的，在这里不对，真搞不懂
+   return a&b;//在dev里是对的，在这里不*/
+   return (!((x+(~(0x30)+1))>>31))&((x+(~(0x3a)+1))>>31);
 }
 /* 
  * conditional - same as x ? y : z 
@@ -325,7 +325,7 @@ int floatFloat2Int(unsigned uf) {
     if(!(uf&0x7fffffff)) return 0;
     if(exp > 31) return 0x80000000;
     if(exp < 0) return 0;
-    if(exp > 23) frac <<= (exp_-23);
+    if(exp > 23) frac <<= (exp-23);
     else frac >>= (23-exp);
 
     if(!((frac>>31)^s)) return frac;
