@@ -179,7 +179,13 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+    /*此题关键在于要求不能使用大于0xff的数，只要构造出0xffffffff即可*/
+    int a=0xaa;
+    int b=(a<<8)+a;
+    int c=(b<<8)+a;
+    int d=(c<<8)+a;
+    int e=!(~x&d);
+    return e;
 }
 /* 
  * negate - return -x 
@@ -189,7 +195,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    return (~x+1);//ppt
 }
 //3
 /* 
@@ -202,7 +208,10 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+    int a=!((x+6)>>6);//上限
+    int b=((x-16)>>5);//下限
+    int c=a&b;
+    return c;
 }
 /* 
  * conditional - same as x ? y : z 
@@ -212,7 +221,9 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+    int mask;
+  mask=!x+~1+1;
+  return (mask&y)|(~mask&z);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -222,7 +233,11 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  return 2;  int x1=x>>31;
+  int y1=y>>31;
+  int r=((x+(~y))>>31)&(!(x1^y1));
+  int s=x1&(!y1);
+  return r|s;
 }
 //4
 /* 
@@ -234,10 +249,10 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+   return ~(((~x+1)|x)>> 31)&1;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
- *             two's complement
+ *               two's complement
  *  Examples: howManyBits(12) = 5
  *            howManyBits(298) = 10
  *            howManyBits(-5) = 4
@@ -249,7 +264,22 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  int shiftSign = x >> 31;
+    int operations = shiftSign ^ x;      
+    int negateOps = !operations;
+    int oppSign =  (!(!operations) << 31) >> 31;
+    int shift16 = !(!(operations >> 16)) << 4;
+    operations = operations >> shift16;
+    int shift8 = !(!(operations >> 8)) << 3;
+    operations = operations >> shift8;
+    int shift4 = !(!(operations >> 4)) << 2;
+    operations = operations >> shift4;
+    int shift2 = !(!(operations >> 2)) << 1;
+    operations = operations >> shift2;
+    int shift1 = !(!(operations >> 1));
+    operations = shift16 + shift8 + shift4 + shift2 + shift1;
+    operations += 2;   
+    return (negateOps | (operations&oppSign));
 }
 //float
 /* 
@@ -264,7 +294,13 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  int exp_ = (uf&0x7f800000)>>23;
+  int s_ = uf&0x80000000;
+  if(exp_ == 0) return (uf<<1)|s_;
+  if(exp_ == 255) return uf;
+  ++exp_;
+  if(exp_ == 255) return 0x7f800000|s_;
+  return (uf&0x807fffff)|(exp_<<23);
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -279,7 +315,21 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+ int s_    = uf>>31;
+  int exp_  = ((uf&0x7f800000)>>23)-127;
+  int frac_ = (uf&0x007fffff)|0x00800000; 
+  if(!(uf&0x7fffffff)) return 0;
+  
+  if(exp_ > 31) return 0x80000000;
+  if(exp_ < 0) return 0;
+  
+  if(exp_ > 23) frac_ <<= (exp_-23);
+  else frac_ >>= (23-exp_);
+
+  if(!((frac_>>31)^s_)) return frac_;
+  else if(frac_>>31) return 0x80000000;
+  else return ~frac_+1;
+       
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -295,5 +345,9 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+    if(x<-127) return 0;
+  if(x>128) return 0x7f800000;
+  x += 127;
+  x = x << 23;
+  return x;
 }
